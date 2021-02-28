@@ -42,12 +42,12 @@ class OscillatorConsensus(Consensus):
         self.evaluate_stoch()
         self.evaluate_cci(period=20)
         self.evaluate_adx()
-        # awesome osc
+        self.evaluate_awesome_oscilator()
         self.evaluate_macd()
         self.evaluate_momentum(period=10)
-        # stoch rsi
+        self.evaluate_stochrsi()
         self.evaluate_williams()
-        # bull bear
+        self.evaluate_bears_power()
         self.evaluate_ultimate_oscilator()
 
 

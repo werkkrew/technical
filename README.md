@@ -29,6 +29,7 @@ buy/sell graph. - MovingAverage Consensus - Oscillator Consensus - Summary Conse
 * [MADR](https://www.tradingview.com/script/25KCgL9H/) - Moving Average Deviation Rate
 * [SSL](https://www.tradingview.com/script/xzIoaIJC-SSL-channel/) - SSL Channel
 * [PMAX](https://www.tradingview.com/script/sU9molfV/) - PMAX indicator
+* [BBPT](https://www.tradingview.com/ideas/bearpower/) - Bulls Bears Power (BBPT)
 
 ### Utilities
 
@@ -54,6 +55,8 @@ The following indicators are available and have been 'wrapped' to be used on a d
 * sma
 * ema
 * tema
+* [Awesome Oscillator](https://www.tradingview.com/scripts/awesomeoscillator/) - dataframe, sma1, sma2, field
+* [Stochastic RSI](https://www.investopedia.com/terms/s/stochrsi.asp) - dataframe, period, field
 
 We will try to add more and more wrappers as we get to it, but please be patient or help out with PR's! It's super easy, but also super boring work.
 

@@ -12,6 +12,15 @@ from numpy.core.records import ndarray
 
 # ADX                  Average Directional Movement Index
 # ADXR                 Average Directional Movement Index Rating
+# AO                   Awesome Oscillator
+def ao(dataframe, sma1=5, sma2=34, field='hl2'):
+    from .overlap_studies import sma
+    dataframe = dataframe.copy()
+    dataframe['hl2'] = (dataframe['high'] + dataframe['low']) / 2
+    dataframe['ao'] = sma(dataframe, sma1, field) - sma(dataframe, sma2, field)
+    return = dataframe['ao']
+
+
 # APO                  Absolute Price Oscillator
 # AROON                Aroon
 # AROONOSC             Aroon Oscillator
@@ -55,12 +64,18 @@ def momentum(dataframe, field='close', period=9):
 # STOCH                Stochastic
 # STOCHF               Stochastic Fast
 # STOCHRSI             Stochastic Relative Strength Index
+def stochrsi(dataframe, period=14, field='close'):
+    from pyti.stochrsi import stochrsi
+    return stochrsi(dataframe[field], period)
+
+
 # TRIX                 1-day Rate-Of-Change (ROC) of a Triple Smooth EMA
 
 # ULTOSC               Ultimate Oscillator
 def ultimate_oscilator(dataframe):
     from pyti.ultimate_oscillator import ultimate_oscillator as uo
     uo(dataframe['close'], dataframe['low'])
+    return uo
 
 
 # WILLR                Williams' %R

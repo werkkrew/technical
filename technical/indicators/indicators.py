@@ -1151,3 +1151,17 @@ def PMAX(dataframe, period=10, multiplier=3, length=12, MAtype=1, src=1):
     df.fillna(0, inplace=True)
 
     return df
+
+def BBPT(dataframe):
+    """
+    https://www.tradingview.com/ideas/bearpower/
+    Bull power and bear power by Dr. Alexander Elder show where today’s high and low lie relative to the a 13-day EMA
+    """
+    import talib as ta
+    df = dataframe.copy()
+
+    df['bull_power'] = Series(df['high'] - ta.EMA(df['close'], timeperiod=13))
+    df['bear_power'] = Series(df['low'] - ta.EMA(df['close'], timeperiod=13))
+    df['bull_bear'] = df['bull_power'] - df['bear_power']
+
+    return df[['bull_bear', 'bull_power', 'bear_power']]

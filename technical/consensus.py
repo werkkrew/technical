@@ -747,3 +747,91 @@ class Consensus:
             ),
             'sell_{}'.format(name)
         ] = (1 * impact_sell)
+
+    def evaluate_awesome_oscilator(self, prefix="ao", impact_buy=1, impact_sell=1):
+        """
+        evaluates the osc
+        :param dataframe:
+        :param period:
+        :param prefix:
+        :return:
+        """
+        from technical.indicators import ao
+
+        self._weights(impact_buy, impact_sell)
+        dataframe = self.dataframe
+        name = '{}'.format(prefix)
+        dataframe[name] = ao(dataframe)
+
+        dataframe.loc[
+            (
+                (dataframe[name] > 0)
+            ),
+            'buy_{}'.format(name)
+        ] = (1 * impact_buy)
+
+        dataframe.loc[
+            (
+                (dataframe[name] < 0)
+            ),
+            'sell_{}'.format(name)
+        ] = (1 * impact_sell)
+
+    def evaluate_stochrsi(self, prefix="srsi", impact_buy=1, impact_sell=1):
+        """
+        evaluates the osc
+        :param dataframe:
+        :param period:
+        :param prefix:
+        :return:
+        """
+        from technical.indicators import stochrsi
+
+        self._weights(impact_buy, impact_sell)
+        dataframe = self.dataframe
+        name = '{}'.format(prefix)
+        dataframe[name] = ao(dataframe)
+
+        dataframe.loc[
+            (
+                (dataframe[name] < 20)
+            ),
+            'buy_{}'.format(name)
+        ] = (1 * impact_buy)
+
+        dataframe.loc[
+            (
+                (dataframe[name] > 80)
+            ),
+            'sell_{}'.format(name)
+        ] = (1 * impact_sell)
+
+    def evaluate_bears_power(self, prefix="bbpt", impact_buy=1, impact_sell=1):
+        """
+        evaluates the osc
+        :param dataframe:
+        :param period:
+        :param prefix:
+        :return:
+        """
+        from technical.indicators import BBPT
+
+        self._weights(impact_buy, impact_sell)
+        dataframe = self.dataframe
+        name = '{}'.format(prefix)
+        bears_power = BBPT(dataframe)
+        dataframe[name] = bears_power['bull_bear']
+
+        dataframe.loc[
+            (
+                (dataframe[name] > 0)
+            ),
+            'buy_{}'.format(name)
+        ] = (1 * impact_buy)
+
+        dataframe.loc[
+            (
+                (dataframe[name] < 0)
+            ),
+            'sell_{}'.format(name)
+        ] = (1 * impact_sell)
