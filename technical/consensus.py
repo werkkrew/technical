@@ -106,16 +106,14 @@ class Consensus:
         scores = dataframe.filter(regex="^(buy|sell)_.*").fillna(0)
 
         # computes a score between 0 and 100. The closer to 100 the more aggrement
-        dataframe["{}_score_sell".format(prefix)] = scores.filter(regex="^(sell)_.*").sum(
-            axis=1) / self.sell_weights * 100
+        dataframe["{}_score_sell".format(prefix)] = scores.filter(regex="^(sell)_.*").sum(axis=1) / self.sell_weights * 100
         dataframe["{}_score_buy".format(prefix)] = scores.filter(regex="^(buy)_.*").sum(axis=1) / self.buy_weights * 100
 
         if smooth is not None:
             dataframe["{}_score_buy".format(prefix)] = dataframe["{}_score_buy".format(prefix)].rolling(smooth).mean()
             dataframe["{}_score_sell".format(prefix)] = dataframe["{}_score_sell".format(prefix)].rolling(smooth).mean()
 
-        return {'sell':
-                    dataframe["{}_score_sell".format(prefix)],
+        return {'sell': dataframe["{}_score_sell".format(prefix)],
                 'buy': dataframe["{}_score_buy".format(prefix)],
                 "buy_agreement": scores.filter(regex="^(buy)_.*").sum(axis=1),
                 "sell_agreement": scores.filter(regex="^(sell)_.*").sum(axis=1),
@@ -127,6 +125,66 @@ class Consensus:
                     axis=1),
 
                 }
+
+    def evaluate_consensus(self, consensus, prefix, smooth=0, buy_score=80, sell_score=80,
+                           impact_buy=1, impact_sell=1, average=False):
+        """
+        evaluates another consensus indicator
+        and integrates it into this indicator
+        :param dataframe:
+        :param period:
+        :param prefix:
+        :param average: should an average based approach be used or the total computed weight
+        :return:
+        """
+
+        if average:
+            self._weights(impact_buy, impact_sell)
+        else:
+            self._weights(consensus.buy_weights, consensus.sell_weights)
+
+        dataframe = self.dataframe
+        name = '{}_'.format(prefix)
+
+        result = {}
+        if smooth > 0:
+            result = consensus.score(smooth=smooth)
+        else:
+            result = consensus.score()
+
+        dataframe['{}_buy'.format(name)] = result['buy']
+        dataframe['{}_sell'.format(name)] = result['sell']
+
+        if average:
+            dataframe.loc[
+                (
+                    (dataframe['{}_buy'.format(name)] > buy_score)
+                ),
+                'buy_{}'.format(name)
+            ] = (1 * impact_buy)
+
+            dataframe.loc[
+                (
+
+                    (dataframe['{}_sell'.format(name)] >= sell_score)
+                ),
+                'sell_{}'.format(name)
+            ] = (1 * impact_sell)
+        else:
+            dataframe.loc[
+                (
+                    (dataframe['{}_buy'.format(name)] > buy_score)
+                ),
+                'buy_{}'.format(name)
+            ] = (consensus.buy_weights * impact_buy)
+
+            dataframe.loc[
+                (
+
+                    (dataframe['{}_sell'.format(name)] >= sell_score)
+                ),
+                'sell_{}'.format(name)
+            ] = (consensus.sell_weights * impact_sell)
 
     def evaluate_rsi(self, period=14, prefix="rsi", impact_buy=1, impact_sell=1):
         """
@@ -503,66 +561,6 @@ class Consensus:
             ),
             'sell_{}'.format(name)
         ] = (1 * impact_sell)
-
-    def evaluate_consensus(self, consensus, prefix, smooth=0, buy_score=80, sell_score=80,
-                           impact_buy=1, impact_sell=1, average=False):
-        """
-        evaluates another consensus indicator
-        and integrates it into this indicator
-        :param dataframe:
-        :param period:
-        :param prefix:
-        :param average: should an average based approach be used or the total computed weight
-        :return:
-        """
-
-        if average:
-            self._weights(impact_buy, impact_sell)
-        else:
-            self._weights(consensus.buy_weights, consensus.sell_weights)
-
-        dataframe = self.dataframe
-        name = '{}_'.format(prefix)
-
-        result = {}
-        if smooth > 0:
-            result = consensus.score(smooth=smooth)
-        else:
-            result = consensus.score()
-
-        dataframe['{}_buy'.format(name)] = result['buy']
-        dataframe['{}_sell'.format(name)] = result['sell']
-
-        if average:
-            dataframe.loc[
-                (
-                    (dataframe['{}_buy'.format(name)] > buy_score)
-                ),
-                'buy_{}'.format(name)
-            ] = (1 * impact_buy)
-
-            dataframe.loc[
-                (
-
-                    (dataframe['{}_sell'.format(name)] >= sell_score)
-                ),
-                'sell_{}'.format(name)
-            ] = (1 * impact_sell)
-        else:
-            dataframe.loc[
-                (
-                    (dataframe['{}_buy'.format(name)] > buy_score)
-                ),
-                'buy_{}'.format(name)
-            ] = (consensus.buy_weights * impact_buy)
-
-            dataframe.loc[
-                (
-
-                    (dataframe['{}_sell'.format(name)] >= sell_score)
-                ),
-                'sell_{}'.format(name)
-            ] = (consensus.sell_weights * impact_sell)
 
     def evaluate_cmo(self, period=20, prefix="cmo", impact_buy=1, impact_sell=1):
         """
